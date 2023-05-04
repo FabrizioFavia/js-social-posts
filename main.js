@@ -1,3 +1,4 @@
+ const mainContainer = document.getElementById("container");
 const posts = [
     {
         "id": 1,
@@ -55,3 +56,43 @@ const posts = [
         "created": "2021-03-05"
     }
 ];
+
+function createAndAppendEl(elementType, className, container, attributes) {
+
+    let elementLocal = document.createElement(elementType);
+    className.forEach(element => {
+        elementLocal.classList.add(element);
+    });
+    attributes.forEach(element => {
+        elementLocal.setAttribute(element.name, element.value)
+    });
+    container.append(elementLocal);
+    return elementLocal;
+}
+
+
+
+for (let i = 0; i <= posts.length; i++) {
+    const singlePost = posts[i];
+
+    /* CREO CARD POST */
+    let postCard = createAndAppendEl("div", ["post"], mainContainer, []);
+    let postHeader = createAndAppendEl("div", ["post__header"], postCard, []);
+    let postMeta = createAndAppendEl("div", ["post-meta"], postHeader, []);
+    let postMetaIcon = createAndAppendEl("div", ["post-meta__icon"], postMeta, []);
+    let profilePics = [
+        {
+            name: "src",
+            value: singlePost.author.image
+        },
+        {
+            name: "alt",
+            value: singlePost.author.name
+        }
+    ];
+    createAndAppendEl("img", ["profile-pic"], postMetaIcon, profilePics);
+    /* CREO POST HEADER E LO INSERISCO NELLA CARD */
+    mainContainer.append(postCard);
+
+} 
+
