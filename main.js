@@ -1,13 +1,16 @@
- const mainContainer = document.getElementById("container");
+const mainContainer = document.getElementById("container");
+
 const posts = [
     {
         "id": 1,
         "content": "Placeat libero ipsa nobis ipsum quibusdam quas harum ut. Distinctio minima iusto. Ad ad maiores et sint voluptate recusandae architecto. Et nihil ullam aut alias.",
         "media": "https://unsplash.it/600/300?image=171",
+
         "author": {
             "name": "Phil Mangione",
             "image": "https://unsplash.it/300/300?image=15"
         },
+
         "likes": 80,
         "created": "2021-06-25"
     },
@@ -57,7 +60,23 @@ const posts = [
     }
 ];
 
-function createAndAppendEl(elementType, className, container, attributes) {
+const cardContainer = [];
+
+
+
+
+/**
+ * descrizione
+ * @param elementType string  -> tipo di tag html 
+ * @param className Array<string> -> si aspetta più elementi
+ * @param container: HTMLElemwnt -> è il container in cui verranno appesi gli elementi creati
+ * @param attributes: Array<Objects> -> array di oggetti composti name e value
+ * @param text: string -> innerHTML appeso al Document
+ * @returns HTMLElement -> output della funzione
+ **/
+
+
+function createAndAppendEl(elementType, className, container, attributes, text) {
 
     let elementLocal = document.createElement(elementType);
     className.forEach(element => {
@@ -66,20 +85,28 @@ function createAndAppendEl(elementType, className, container, attributes) {
     attributes.forEach(element => {
         elementLocal.setAttribute(element.name, element.value)
     });
+    elementLocal.innerHTML = text;
     container.append(elementLocal);
+
     return elementLocal;
 }
 
 
 
-for (let i = 0; i <= posts.length; i++) {
-    const singlePost = posts[i];
+posts.forEach(singlePost => {
 
+    const card = {
+        id: singlePost.id,
+        likes: singlePost.likes,
+        click: false,
+        element: null
+    }
     /* CREO CARD POST */
-    let postCard = createAndAppendEl("div", ["post"], mainContainer, []);
-    let postHeader = createAndAppendEl("div", ["post__header"], postCard, []);
-    let postMeta = createAndAppendEl("div", ["post-meta"], postHeader, []);
-    let postMetaIcon = createAndAppendEl("div", ["post-meta__icon"], postMeta, []);
+    let postCard = createAndAppendEl("div", ["post"], mainContainer, [], "");
+    let postHeader = createAndAppendEl("div", ["post__header"], postCard, [], "");
+    let postMeta = createAndAppendEl("div", ["post-meta"], postHeader, [], "");
+    let postMetaIcon = createAndAppendEl("div", ["post-meta__icon"], postMeta, [], "");
+
     let profilePics = [
         {
             name: "src",
@@ -90,9 +117,72 @@ for (let i = 0; i <= posts.length; i++) {
             value: singlePost.author.name
         }
     ];
-    createAndAppendEl("img", ["profile-pic"], postMetaIcon, profilePics);
-    /* CREO POST HEADER E LO INSERISCO NELLA CARD */
-    mainContainer.append(postCard);
 
-} 
+    createAndAppendEl("img", ["profile-pic"], postMetaIcon, profilePics, "");
+    let postMetaData = createAndAppendEl("div", ["post-meta__data"], postMeta, [], "");
+    createAndAppendEl("div", ["post-meta__author"], postMetaData, [], singlePost.author.name);
+    createAndAppendEl("div", ["post-meta__time"], postMetaData, [], singlePost.created);
+    createAndAppendEl("div", ["post__text"], postCard, [], singlePost.content);
+    let postImage = createAndAppendEl("div", ["post__image"], postCard, [], "");
+    let postImageAttributes = [
+        {
+            name: "src",
+            value: singlePost.media
+        },
+        {
+            name: "alt",
+            value: ""
+        }
+    ];
+
+    createAndAppendEl("img", ["post__image"], postImage, postImageAttributes, "");
+    let postFooter = createAndAppendEl("div", ["post__footer"], postCard, [], "");
+    let likes = createAndAppendEl("div", ["likes", "js-likes"], postFooter, [], "");
+    let likesCta = createAndAppendEl("div", ["likes__cta"], likes, [], "");
+
+    let btnAttributes = [
+        {
+            name: "href",
+            value: "#"
+        },
+        {
+            name: "data-postid",
+            value: singlePost.id
+        },
+        {
+            name: "id",
+            value: "button_" + singlePost.id
+        }
+    ];
+
+    let likeBtn = createAndAppendEl("a", ["like-button", "js-like-button"], likesCta, btnAttributes, "");
+    createAndAppendEl("i", ["like-button__icon", "fas", "fa-thumbs-up"], likeBtn, [{ name: "aria-hidden", value: "true" }], "");
+    createAndAppendEl("span", ["like-button__label"], likeBtn, [], " Mi Piace");
+
+    cardContainer.push(card);
+
+    let likesNumber = "Piace a <b id=\"like-counter-1\" class=\"js-likes-counter\"> <span id=\"likes_" + card.id + "\" >" + card.likes + "</span>" + "</b> persone";
+    createAndAppendEl("div", ["likes__counter"], likes, [], likesNumber);
+
+
+    likeBtn.addEventListener("click", function(){
+        let cardId = cardContainer.filter(e => e.id === card.id)[0]
+        cardId.click = !cardId.click;
+    
+    
+        if (cardId.click) {
+            cardId.likes += 1
+            document.getElementById("button_" + cardId.id).classList.add("colorBlue"); 
+        console.log(cardContainer);
+        } else {
+            cardId.likes -= 1
+            document.getElementById("button_" + cardId.id).classList.remove("colorBlue"); 
+        }
+        document.getElementById("likes_" + cardId.id).innerHTML = cardId.likes;
+        console.log(cardContainer);
+    })
+});
+
+console.log(cardContainer);
+
 
